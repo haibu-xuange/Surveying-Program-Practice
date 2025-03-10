@@ -530,7 +530,8 @@ class MainWindow(QMainWindow):
                         self.gps_table.setItem(row, 2, y_item)
                         
                         # 高程异常ζ
-                        z_item = QTableWidgetItem(parts[3] if parts[3] else "未知")
+                        z_value = parts[3] if parts[3] else "未知"
+                        z_item = QTableWidgetItem(z_value)
                         if parts[3]:  # 已知点
                             z_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
                         else:  # 未知点
@@ -538,7 +539,8 @@ class MainWindow(QMainWindow):
                         self.gps_table.setItem(row, 3, z_item)
                         
                         # 类型
-                        type_item = QTableWidgetItem("已知" if parts[3] else "未知")
+                        type_value = "已知" if parts[3] else "未知"
+                        type_item = QTableWidgetItem(type_value)
                         type_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
                         self.gps_table.setItem(row, 4, type_item)
         except Exception as e:
