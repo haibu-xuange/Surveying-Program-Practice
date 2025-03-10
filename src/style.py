@@ -1,16 +1,19 @@
 # style.py
 MAIN_STYLESHEET = """
+/* 主窗口样式 */
 QMainWindow {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
         stop:0 #0a1f3d, stop:1 #1a3b5a);
     border-radius: 10px;
 }
 
+/* 通用控件样式 */
 QWidget {
     background: transparent;
     font-family: '微软雅黑';
 }
 
+/* 分组框样式 */
 QGroupBox {
     background: rgba(16, 32, 64, 200);
     border: 2px solid #3a6da3;
@@ -31,6 +34,7 @@ QGroupBox::title {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* 输入控件样式 */
 QLineEdit, QTextEdit, QComboBox {
     background: rgba(16, 32, 64, 0.6);
     border: 1px solid #3a6da3;
@@ -46,6 +50,7 @@ QComboBox QAbstractItemView {
     selection-background-color: #3a6da3;
 }
 
+/* 按钮样式 */
 QPushButton {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         stop:0 #3a6da3, stop:1 #2a4d7a);
@@ -66,6 +71,7 @@ QPushButton:pressed {
         stop:0 #2a4d7a, stop:1 #3a6da3);
 }
 
+/* 标签页样式 */
 QTabWidget::pane {
     border: none;
     background: rgba(255, 255, 255, 0.05);
@@ -84,6 +90,7 @@ QTabBar::tab:selected {
     color: white;
 }
 
+/* 文本编辑框样式 */
 QTextEdit {
     background-color: rgba(0, 0, 0, 0.15);
     border-radius: 6px;
@@ -91,11 +98,13 @@ QTextEdit {
     color: #a0f0ff;
 }
 
+/* 标签样式 */
 QLabel {
     color: #b0f0ff;
     font-weight: semi-bold;
 }
 
+/* 滚动条样式 */
 QScrollBar:vertical {
     background: rgba(255, 255, 255, 0.05);
     width: 10px;
@@ -106,5 +115,106 @@ QScrollBar::handle:vertical {
     background: rgba(52, 152, 219, 0.6);
     min-height: 20px;
     border-radius: 4px;
+}
+
+/* 菜单栏样式 */
+QMenuBar {
+    background: rgba(16, 32, 64, 0.9);
+    padding: 4px;
+    border-bottom: 1px solid #3a6da3;
+}
+
+QMenuBar::item {
+    color: #a0d0ff;
+    padding: 4px 10px;
+    background: transparent;
+}
+
+QMenuBar::item:selected {
+    background: rgba(58, 109, 163, 0.6);
+    border-radius: 4px;
+}
+
+QMenu {
+    background: rgba(16, 32, 64, 0.9);
+    border: 1px solid #3a6da3;
+    color: #a0d0ff;
+}
+
+QMenu::item {
+    padding: 6px 25px;
+}
+
+QMenu::item:selected {
+    background: rgba(58, 109, 163, 0.6);
+}
+
+/* 下拉框样式增强 */
+QComboBox {
+    color: #a0f0ff;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left: 1px solid #3a6da3;
+}
+
+QComboBox::down-arrow {
+    image: url(icons/down_arrow.svg);
+}
+
+/* 数值输入框增强 */
+QDoubleSpinBox, QSpinBox {
+    background: rgba(16, 32, 64, 0.6);
+    border: 1px solid #4d8fcc;
+    border-radius: 4px;
+    color: #a0f0ff;
+    padding: 5px;
+}
+
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+    width: 20px;
+    background: rgba(58, 109, 163, 0.3);
+}
+
+QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+    background: rgba(58, 109, 163, 0.5);
+}
+
+/* 表格样式 */
+QTableWidget {
+    background: rgba(16, 32, 64, 0.5);
+    border: 1px solid #3a6da3;
+    gridline-color: #2a4d7a;
+    font-family: Consolas;
+}
+
+QHeaderView::section {
+    background-color: #1a3b5a;
+    color: #8ab4f8;
+    padding: 6px;
+    border: none;
+}
+
+QTableWidget::item {
+    padding: 4px;
+    border-bottom: 1px solid #2a4d7a;
+}
+
+/* 结果标签样式 */
+QLabel#result_label {
+    font-size: 16px;
+    color: #4d8fcc;
+    padding: 10px;
+    border: 1px solid #3a6da3;
+    border-radius: 4px;
+}
+
+/* 按钮组布局 */
+QHBoxLayout > QPushButton {
+    margin-right: 10px;
+    min-width: 100px;
 }
 """
