@@ -217,4 +217,62 @@ QHBoxLayout > QPushButton {
     margin-right: 10px;
     min-width: 100px;
 }
+
+QTableWidget#curvature_table {
+    background: rgba(16, 32, 64, 0.6);
+    border: 1px solid #3a6da3;
+    gridline-color: #2a4d7a;
+    font-family: Consolas;
+    color: #a0f0ff;
+}
+
+QTableWidget#curvature_table QTableCornerButton::section {
+    background-color: #1a3b5a;
+    border: 1px solid #3a6da3;
+}
+
+QTableWidget#curvature_table::item {
+    padding: 6px;
+    border-bottom: 1px solid #2a4d7a;
+    color: #a0f0ff;
+}
+
+QTableWidget#curvature_table::item:selected {
+    background-color: #3a6da3;
+    color: #ffffff;
+}
+
+/* 子午线弧长结果样式 */
+QLabel#arc_result_value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4d8fcc;
+    background: rgba(16, 32, 64, 0.6);
+    border: 1px solid #3a6da3;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+    min-width: 200px;
+    text-align: center;
+}
+
+/* 子午线收敛角表格样式 */
+QTableWidget#gamma_table {
+    background: rgba(16, 32, 64, 0.6);
+    border: 1px solid #3a6da3;
+    gridline-color: #2a4d7a;
+    font-family: Consolas;
+    color: #a0f0ff;
+}
+
+QTableWidget#gamma_table::item {
+    padding: 6px;
+    border-bottom: 1px solid #2a4d7a;
+    color: #a0f0ff;
+}
+
+QTableWidget#gamma_table::item:selected {
+    background-color: #3a6da3;
+    color: #ffffff;
+}
 """

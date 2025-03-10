@@ -2,8 +2,10 @@
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QLineEdit, QPushButton, QFileDialog, QComboBox,
                              QTextEdit, QMessageBox, QGroupBox, QFormLayout,
-                             QDoubleSpinBox, QTableWidgetItem, QStackedWidget, QAction)
+                             QDoubleSpinBox, QTableWidgetItem, QStackedWidget, QAction,
+                             QTableWidget, QHeaderView,)
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 from coordinate_converter import CoordinateConverter
 from file_io import FileHandler
 from style import MAIN_STYLESHEET
@@ -286,7 +288,11 @@ class MainWindow(QMainWindow):
         param_group.setLayout(param_layout)
         
         # 结果表格
-        self.curvature_table = ResultTable(["纬度", "M", "N", "R", "RA"])
+        self.curvature_table = QTableWidget()
+        self.curvature_table.setObjectName("curvature_table")  # 设置对象名称
+        self.curvature_table.setColumnCount(5)
+        self.curvature_table.setHorizontalHeaderLabels(["纬度", "M", "N", "R", "RA"])
+        self.curvature_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
         # 操作按钮
         btn_calculate = QPushButton("开始计算", clicked=self.calculate_curvature)
@@ -348,16 +354,15 @@ class MainWindow(QMainWindow):
         param_group.setLayout(param_layout)
         
         # 结果展示
-        self.arc_result_label = QLabel("弧长计算结果：")
         self.arc_result_value = QLabel()
-        self.arc_result_value.setStyleSheet("font-size: 14px; color: #4d8fcc;")
+        self.arc_result_value.setObjectName("arc_result_value")  # 设置对象名称
+        self.arc_result_value.setAlignment(Qt.AlignCenter)
         
         # 操作按钮
         btn_calculate = QPushButton("开始计算", clicked=self.calculate_arc_length)
         
         layout.addWidget(param_group)
         layout.addWidget(btn_calculate)
-        layout.addWidget(self.arc_result_label)
         layout.addWidget(self.arc_result_value)
         return widget
 
@@ -400,7 +405,11 @@ class MainWindow(QMainWindow):
         param_group.setLayout(param_layout)
         
         # 结果表格
-        self.gamma_table = ResultTable(["纬度B", "经差l", "收敛角γ"])
+        self.gamma_table = QTableWidget()
+        self.gamma_table.setObjectName("gamma_table")  # 设置对象名称
+        self.gamma_table.setColumnCount(3)
+        self.gamma_table.setHorizontalHeaderLabels(["纬度B", "经差l", "收敛角γ"])
+        self.gamma_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
         # 操作按钮
         btn_calculate = QPushButton("开始计算", clicked=self.calculate_convergence)
