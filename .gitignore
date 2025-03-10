@@ -1,11 +1,3 @@
-result/Geodetic_Coordinates/GCC_20250310_165055.txt
-result/Geodetic_Coordinates/GCC_20250310_165112.txt
-result/Geodetic_Coordinates/GCC_20250310_165302.txt
-result/Geodetic_Coordinates/GCC_20250310_171752.txt
-result/Geodetic_Coordinates/GCC_20250310_171810.txt
-result/Local_Cartesian_Coordinates/LCC_20250310_165112.txt
-result/Local_Cartesian_Coordinates/LCC_20250310_165302.txt
-result/Local_Cartesian_Coordinates/LCC_20250310_171810.txt
 src/__pycache__/coordinate_converter.cpython-39.pyc
 src/__pycache__/coordinate_converter.cpython-311.pyc
 src/__pycache__/file_io.cpython-39.pyc
