@@ -1,8 +1,9 @@
-# style.py 用于设置程序的样式
+# style.py
 MAIN_STYLESHEET = """
 QMainWindow {
-    background-color: rgba(13, 40, 62, 0.95);
-    border-radius: 8px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #0a1f3d, stop:1 #1a3b5a);
+    border-radius: 10px;
 }
 
 QWidget {
@@ -11,12 +12,13 @@ QWidget {
 }
 
 QGroupBox {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(52, 152, 219, 0.3);
+    background: rgba(16, 32, 64, 200);
+    border: 2px solid #3a6da3;
     border-radius: 8px;
-    margin-top: 10px;
-    padding: 15px 5px 5px 5px;
-    color: #ecf0f1;
+    color: #a0d0ff;
+    font-size: 14px;
+    padding: 15px;
+    margin: 10px;
 }
 
 QGroupBox::title {
@@ -24,33 +26,44 @@ QGroupBox::title {
     subcontrol-position: top left;
     left: 10px;
     padding: 0 5px;
-    color: #3498db;
+    color: #b0e0ff;
+    font-size: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 QLineEdit, QTextEdit, QComboBox {
-    background-color: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(52, 152, 219, 0.3);
+    background: rgba(16, 32, 64, 0.6);
+    border: 1px solid #3a6da3;
     border-radius: 4px;
     padding: 6px;
-    color: #ecf0f1;
-    selection-background-color: #2980b9;
+    color: #a0f0ff;
+    selection-background-color: #3a6da3;
+}
+
+QComboBox QAbstractItemView {
+    background: rgba(16, 32, 64, 0.8);
+    color: #a0f0ff;
+    selection-background-color: #3a6da3;
 }
 
 QPushButton {
-    background-color: rgba(52, 152, 219, 0.7);
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    color: white;
-    min-width: 80px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3a6da3, stop:1 #2a4d7a);
+    border: 1px solid #4d8fcc;
+    border-radius: 5px;
+    color: #d0f0ff;
+    padding: 8px 15px;
+    font-weight: bold;
 }
 
 QPushButton:hover {
-    background-color: rgba(41, 128, 185, 0.8);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #4d8fcc, stop:1 #3a6da3);
 }
 
 QPushButton:pressed {
-    background-color: rgba(21, 67, 96, 0.9);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2a4d7a, stop:1 #3a6da3);
 }
 
 QTabWidget::pane {
@@ -75,10 +88,12 @@ QTextEdit {
     background-color: rgba(0, 0, 0, 0.15);
     border-radius: 6px;
     font-family: 'Consolas';
+    color: #a0f0ff;
 }
 
 QLabel {
-    color: #bdc3c7;
+    color: #b0f0ff;
+    font-weight: semi-bold;
 }
 
 QScrollBar:vertical {

@@ -83,27 +83,33 @@ class MainWindow(QMainWindow):
         group = QGroupBox("空间直角转站心坐标")
         layout = QVBoxLayout()
         
-        # 文件选择
+        # 文件操作组（改为水平布局）
         file_group = QGroupBox("文件操作")
-        file_layout = QVBoxLayout()
+        file_layout = QVBoxLayout()  # 外层用垂直布局包含两个水平部分
+        
+        # 第一行：文件选择（水平布局）
+        file_select_layout = QHBoxLayout()  # 新增水平布局
         self.site_file_edit = QLineEdit()
         btn_browse = QPushButton("浏览", clicked=lambda: self.select_file(self.site_file_edit))
-        file_layout.addWidget(QLabel("输入文件:"))
-        file_layout.addWidget(self.site_file_edit)
-        file_layout.addWidget(btn_browse)
+        file_select_layout.addWidget(QLabel("输入文件:"))  # 按用户要求保持标签
+        file_select_layout.addWidget(self.site_file_edit)
+        file_select_layout.addWidget(btn_browse)
         
-        # 站点输入
+        # 第二行：站点输入（保持原有水平布局）
         site_point_layout = QHBoxLayout()
         self.site_point_edit = QLineEdit()
         site_point_layout.addWidget(QLabel("站心点号:"))
         site_point_layout.addWidget(self.site_point_edit)
-        file_layout.addLayout(site_point_layout)
         
+        # 将两个水平布局加入垂直布局
+        file_layout.addLayout(file_select_layout)
+        file_layout.addLayout(site_point_layout)
         file_group.setLayout(file_layout)
+        
         layout.addWidget(file_group)
         group.setLayout(layout)
         return group
-
+    
     def select_file(self, edit_widget):
         filename, _ = QFileDialog.getOpenFileName(self, "选择文件", "", "Text Files (*.txt)")
         if filename:
@@ -129,8 +135,12 @@ class MainWindow(QMainWindow):
                         'H': blh[2]
                     })
                 blh_output = self.file_handler.format_blh_output(results)
+                # 先将转换结果添加到输出
+                output.append("=== 大地坐标转换结果 ===")
+                output.append(blh_output)
+                # 保存文件并添加路径信息
                 saved_file = self.file_handler.save_blh_file(blh_output)
-                output.append(f"=== 大地坐标转换结果 ===\n文件已保存：{saved_file}")
+                output.append(f"文件已保存：{saved_file}")
             except Exception as e:
                 output.append(f"大地坐标转换错误: {str(e)}")
         
@@ -144,8 +154,12 @@ class MainWindow(QMainWindow):
                     raise ValueError(f"找不到站心点 {site_point}")
                 results = self.converter.xyz_to_site_coords(data, site_data)
                 site_output = self.file_handler.format_site_output(results)
+                # 先将转换结果添加到输出
+                output.append("\n=== 站心坐标转换结果 ===")
+                output.append(site_output)
+                # 保存文件并添加路径信息
                 saved_file = self.file_handler.save_site_file(site_output)
-                output.append(f"\n=== 站心坐标转换结果 ===\n文件已保存：{saved_file}")
+                output.append(f"文件已保存：{saved_file}")
             except Exception as e:
                 output.append(f"\n站心坐标转换错误: {str(e)}")
         
