@@ -275,4 +275,41 @@ QTableWidget#gamma_table::item:selected {
     background-color: #3a6da3;
     color: #ffffff;
 }
+
+
+/* GPS拟合表格样式 */
+QTableWidget#gps_table {
+    background: rgba(16, 32, 64, 0.6);
+    border: 1px solid #3a6da3;
+    gridline-color: #2a4d7a;
+    font-family: Consolas;
+    color: #a0f0ff;
+}
+
+QTableWidget#gps_table::item {
+    padding: 6px;
+    border-bottom: 1px solid #2a4d7a;
+}
+
+QTableWidget#gps_table::item:selected {
+    background-color: #3a6da3;
+    color: #ffffff;
+}
+
+/* 已知点颜色 */
+QTableWidget#gps_table::item[type="known"] {
+    color: #a0f0ff;  /* 冰蓝色 */
+}
+
+/* 未知点颜色 */
+QTableWidget#gps_table::item[type="unknown"] {
+    color: #ff6666;  /* 红色 */
+}
+
+/* 计算结果颜色 */
+QTableWidget#gps_table::item[type="calculated"] {
+    color: #4d8fcc;  /* 亮蓝色 */
+}
+
+
 """

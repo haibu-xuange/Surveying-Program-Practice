@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QLineEdit, QPushButton, QFileDialog, QComboBox,
                              QTextEdit, QMessageBox, QGroupBox, QFormLayout,
                              QDoubleSpinBox, QTableWidgetItem, QStackedWidget, QAction,
-                             QTableWidget, QHeaderView,)
-from PyQt5.QtGui import QIcon
+                             QTableWidget, QHeaderView)
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtCore import Qt
 from coordinate_converter import CoordinateConverter
 from file_io import FileHandler
@@ -12,6 +12,7 @@ from style import MAIN_STYLESHEET
 from widgets import CalculationTabWidget, ResultTable
 from ellipsoid_calculator import EllipsoidCalculator
 from ellipsoid_params import ELLIPSOID_PARAMS
+from gps_fitting import GPSFitter
 
 
 class MainWindow(QMainWindow):
@@ -48,9 +49,15 @@ class MainWindow(QMainWindow):
         self.ellipsoid_action.triggered.connect(lambda: self.switch_page(1))
         coord_menu.addAction(self.ellipsoid_action)
         
+        # GPS拟合菜单
+        self.gps_action = QAction("GPS拟合", self)
+        self.gps_action.triggered.connect(lambda: self.switch_page(2))
+        coord_menu.addAction(self.gps_action)
+        
+
         # 预留功能菜单
         self.reserved_action = QAction("预留功能", self)
-        self.reserved_action.triggered.connect(lambda: self.switch_page(2))
+        self.reserved_action.triggered.connect(lambda: self.switch_page(3))
         coord_menu.addAction(self.reserved_action)
 
     def init_pages(self):
@@ -62,6 +69,10 @@ class MainWindow(QMainWindow):
         # 椭球计算页面（新增功能）
         self.ellipsoid_page = self.create_ellipsoid_page()
         self.stacked_widget.addWidget(self.ellipsoid_page)
+
+        # GPS拟合页面（新增功能）
+        self.gps_page = self.create_gps_page()
+        self.stacked_widget.addWidget(self.gps_page)
         
         # 预留页面
         self.reserved_page = QWidget()
@@ -441,3 +452,165 @@ class MainWindow(QMainWindow):
             
         except Exception as e:
             QMessageBox.critical(self, "错误", str(e))
+
+############ GPS高程拟合 ############
+    def create_gps_page(self):
+        """GPS高程拟合页面"""
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        
+        # 文件操作组
+        file_group = QGroupBox("数据输入")
+        file_layout = QHBoxLayout()
+        self.gps_file_edit = QLineEdit()
+        btn_browse = QPushButton("浏览", clicked=lambda: self.select_gps_file())
+        file_layout.addWidget(QLabel("数据文件:"))
+        file_layout.addWidget(self.gps_file_edit)
+        file_layout.addWidget(btn_browse)
+        file_group.setLayout(file_layout)
+        
+        # 参数选择组
+        param_group = QGroupBox("拟合参数")
+        param_layout = QHBoxLayout()
+        self.gps_method_combo = QComboBox()
+        self.gps_method_combo.addItems(["二次曲面拟合", "多项式平面", "四参数曲面"])
+        param_layout.addWidget(QLabel("拟合方法:"))
+        param_layout.addWidget(self.gps_method_combo)
+        param_group.setLayout(param_layout)
+        
+        # 结果表格
+        self.gps_table = QTableWidget()
+        self.gps_table.setColumnCount(5)
+        self.gps_table.setHorizontalHeaderLabels(["点号", "X", "Y", "ζ", "类型"])
+        self.gps_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        
+        # 操作按钮
+        btn_layout = QHBoxLayout()
+        self.btn_gps_calc = QPushButton("开始计算", clicked=self.calculate_gps)
+        self.btn_gps_export = QPushButton("导出结果", clicked=self.export_gps)
+        btn_layout.addWidget(self.btn_gps_calc)
+        btn_layout.addWidget(self.btn_gps_export)
+        
+        layout.addWidget(file_group)
+        layout.addWidget(param_group)
+        layout.addWidget(self.gps_table)
+        layout.addLayout(btn_layout)
+        return tab
+    
+    def select_gps_file(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "选择数据文件", "", "文本文件 (*.txt)")
+        if filename:
+            self.gps_file_edit.setText(filename)
+            self.load_gps_data(filename)
+
+    def load_gps_data(self, filename):
+        """加载并显示原始数据"""
+        self.gps_table.setRowCount(0)
+        try:
+            with open(filename, 'r') as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if len(parts) >= 4:
+                        row = self.gps_table.rowCount()
+                        self.gps_table.insertRow(row)
+                        
+                        # 点号
+                        point_item = QTableWidgetItem(parts[0])
+                        point_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        self.gps_table.setItem(row, 0, point_item)
+                        
+                        # X坐标
+                        x_item = QTableWidgetItem(parts[1])
+                        x_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        self.gps_table.setItem(row, 1, x_item)
+                        
+                        # Y坐标
+                        y_item = QTableWidgetItem(parts[2])
+                        y_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        self.gps_table.setItem(row, 2, y_item)
+                        
+                        # 高程异常ζ
+                        z_item = QTableWidgetItem(parts[3] if parts[3] else "未知")
+                        if parts[3]:  # 已知点
+                            z_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        else:  # 未知点
+                            z_item.setForeground(QColor('#ff6666'))  # 红色
+                        self.gps_table.setItem(row, 3, z_item)
+                        
+                        # 类型
+                        type_item = QTableWidgetItem("已知" if parts[3] else "未知")
+                        type_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        self.gps_table.setItem(row, 4, type_item)
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"文件读取失败: {str(e)}")
+
+    def calculate_gps(self):
+        try:
+            # 提取已知点
+            known_points = []
+            for row in range(self.gps_table.rowCount()):
+                if self.gps_table.item(row, 4).text() == "已知":
+                    x = float(self.gps_table.item(row, 1).text())
+                    y = float(self.gps_table.item(row, 2).text())
+                    z = float(self.gps_table.item(row, 3).text())
+                    known_points.append((x, y, z))
+            
+            # 选择拟合方法
+            method_map = {
+                "二次曲面拟合": "quadratic",
+                "多项式平面": "plane",
+                "四参数曲面": "four_param"
+            }
+            method = method_map[self.gps_method_combo.currentText()]
+            
+            # 执行拟合
+            predict_func = GPSFitter.fit(known_points, method)
+            
+            # 预测未知点
+            for row in range(self.gps_table.rowCount()):
+                if self.gps_table.item(row, 4).text() == "未知":
+                    x = float(self.gps_table.item(row, 1).text())
+                    y = float(self.gps_table.item(row, 2).text())
+                    z_pred = predict_func(x, y)
+                    
+                    # 更新高程异常ζ
+                    z_item = QTableWidgetItem(f"{z_pred:.4f}")
+                    z_item.setForeground(QColor('#4d8fcc'))  # 预测值特殊颜色
+                    self.gps_table.setItem(row, 3, z_item)
+                    
+                    # 更新类型
+                    type_item = QTableWidgetItem("计算")
+                    type_item.setForeground(QColor('#4d8fcc'))  # 预测值特殊颜色
+                    self.gps_table.setItem(row, 4, type_item)
+            
+            QMessageBox.information(self, "成功", "计算完成！")
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"计算失败: {str(e)}")
+
+    def export_gps(self):
+        try:
+            filename, _ = QFileDialog.getSaveFileName(self, "保存结果", "", "CSV文件 (*.csv)")
+            if filename:
+                with open(filename, 'w', encoding='utf-8-sig') as f:
+                    # 写表头
+                    headers = [self.gps_table.horizontalHeaderItem(i).text() 
+                            for i in range(self.gps_table.columnCount())]
+                    f.write(",".join(headers) + "\n")
+                    
+                    # 写数据
+                    for row in range(self.gps_table.rowCount()):
+                        row_data = []
+                        for col in range(self.gps_table.columnCount()):
+                            item = self.gps_table.item(row, col)
+                            text = item.text() if item else ""
+                            # 特殊处理数值列
+                            if col in (1, 2, 3):  # X/Y/ζ列
+                                try:
+                                    text = f"{float(text):.4f}"
+                                except ValueError:
+                                    pass
+                            row_data.append(text)
+                        f.write(",".join(row_data) + "\n")
+                QMessageBox.information(self, "成功", f"结果已保存到\n{filename}")
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"导出失败: {str(e)}")
