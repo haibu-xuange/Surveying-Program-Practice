@@ -311,5 +311,22 @@ QTableWidget#gps_table::item[type="calculated"] {
     color: #4d8fcc;  /* 亮蓝色 */
 }
 
+/* GPS表格颜色规则 */
+QTableWidget#gps_table QTableWidgetItem[type="known"] {
+    color: #a0f0ff;  /* 已知值颜色 */
+}
 
+QTableWidget#gps_table QTableWidgetItem[type="unknown"] {
+    color: #ff6666;  /* 未知值颜色 */
+}
+
+QTableWidget#gps_table QTableWidgetItem[type="calculated"] {
+    color: #4d8fcc;  /* 计算结果颜色 */
+    font-weight: bold;
+}
+
+/* 统一表格行高 */
+QTableWidget#gps_table {
+    font-size: 12px;
+}
 """

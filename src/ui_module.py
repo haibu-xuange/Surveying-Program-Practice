@@ -510,38 +510,42 @@ class MainWindow(QMainWindow):
             with open(filename, 'r') as f:
                 for line in f:
                     parts = line.strip().split()
-                    if len(parts) >= 4:
+                    if len(parts) >= 3:  # 至少需要点号、X、Y三列
                         row = self.gps_table.rowCount()
                         self.gps_table.insertRow(row)
                         
                         # 点号
                         point_item = QTableWidgetItem(parts[0])
-                        point_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        point_item.setForeground(QColor('#a0f0ff'))
                         self.gps_table.setItem(row, 0, point_item)
                         
                         # X坐标
                         x_item = QTableWidgetItem(parts[1])
-                        x_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        x_item.setForeground(QColor('#a0f0ff'))
                         self.gps_table.setItem(row, 1, x_item)
                         
                         # Y坐标
                         y_item = QTableWidgetItem(parts[2])
-                        y_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        y_item.setForeground(QColor('#a0f0ff'))
                         self.gps_table.setItem(row, 2, y_item)
                         
-                        # 高程异常ζ
-                        z_value = parts[3] if parts[3] else "未知"
+                        # 高程异常ζ（处理可能缺失的第四列）
+                        if len(parts) >= 4 and parts[3].strip() != '':
+                            z_value = parts[3]
+                            type_flag = "已知"
+                            z_color = QColor('#a0f0ff')
+                        else:
+                            z_value = "未知"
+                            type_flag = "未知"
+                            z_color = QColor('#ff6666')
+                        
                         z_item = QTableWidgetItem(z_value)
-                        if parts[3]:  # 已知点
-                            z_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
-                        else:  # 未知点
-                            z_item.setForeground(QColor('#ff6666'))  # 红色
+                        z_item.setForeground(z_color)
                         self.gps_table.setItem(row, 3, z_item)
                         
                         # 类型
-                        type_value = "已知" if parts[3] else "未知"
-                        type_item = QTableWidgetItem(type_value)
-                        type_item.setForeground(QColor('#a0f0ff'))  # 冰蓝色
+                        type_item = QTableWidgetItem(type_flag)
+                        type_item.setForeground(QColor('#a0f0ff'))
                         self.gps_table.setItem(row, 4, type_item)
         except Exception as e:
             QMessageBox.critical(self, "错误", f"文件读取失败: {str(e)}")
@@ -552,10 +556,16 @@ class MainWindow(QMainWindow):
             known_points = []
             for row in range(self.gps_table.rowCount()):
                 if self.gps_table.item(row, 4).text() == "已知":
-                    x = float(self.gps_table.item(row, 1).text())
-                    y = float(self.gps_table.item(row, 2).text())
-                    z = float(self.gps_table.item(row, 3).text())
-                    known_points.append((x, y, z))
+                    try:
+                        x = float(self.gps_table.item(row, 1).text())
+                        y = float(self.gps_table.item(row, 2).text())
+                        z = float(self.gps_table.item(row, 3).text())
+                        known_points.append((x, y, z))
+                    except:
+                        continue  # 跳过无效数据
+            
+            if not known_points:
+                raise ValueError("至少需要1个已知点进行拟合")
             
             # 选择拟合方法
             method_map = {
@@ -563,29 +573,39 @@ class MainWindow(QMainWindow):
                 "多项式平面": "plane",
                 "四参数曲面": "four_param"
             }
-            method = method_map[self.gps_method_combo.currentText()]
+            method = method_map.get(self.gps_method_combo.currentText())
+            if not method:
+                raise ValueError("请选择有效的拟合方法")
             
             # 执行拟合
             predict_func = GPSFitter.fit(known_points, method)
             
-            # 预测未知点
+            # 更新所有未知点
+            updated_count = 0
             for row in range(self.gps_table.rowCount()):
                 if self.gps_table.item(row, 4).text() == "未知":
-                    x = float(self.gps_table.item(row, 1).text())
-                    y = float(self.gps_table.item(row, 2).text())
+                    try:
+                        x = float(self.gps_table.item(row, 1).text())
+                        y = float(self.gps_table.item(row, 2).text())
+                    except ValueError:
+                        continue  # 跳过无效坐标
+                    
+                    # 计算预测值
                     z_pred = predict_func(x, y)
                     
                     # 更新高程异常ζ
                     z_item = QTableWidgetItem(f"{z_pred:.4f}")
-                    z_item.setForeground(QColor('#4d8fcc'))  # 预测值特殊颜色
+                    z_item.setForeground(QColor('#4d8fcc'))  # 计算结果颜色
                     self.gps_table.setItem(row, 3, z_item)
                     
                     # 更新类型
                     type_item = QTableWidgetItem("计算")
-                    type_item.setForeground(QColor('#4d8fcc'))  # 预测值特殊颜色
+                    type_item.setForeground(QColor('#4d8fcc'))
                     self.gps_table.setItem(row, 4, type_item)
-            
-            QMessageBox.information(self, "成功", "计算完成！")
+                    updated_count += 1
+                    
+            QMessageBox.information(self, "成功", 
+                f"计算完成！共更新{updated_count}个未知点")
         except Exception as e:
             QMessageBox.critical(self, "错误", f"计算失败: {str(e)}")
 
@@ -595,24 +615,25 @@ class MainWindow(QMainWindow):
             if filename:
                 with open(filename, 'w', encoding='utf-8-sig') as f:
                     # 写表头
-                    headers = [self.gps_table.horizontalHeaderItem(i).text() 
-                            for i in range(self.gps_table.columnCount())]
+                    headers = ["点号", "X", "Y", "高程异常ζ", "类型"]
                     f.write(",".join(headers) + "\n")
                     
                     # 写数据
                     for row in range(self.gps_table.rowCount()):
                         row_data = []
-                        for col in range(self.gps_table.columnCount()):
+                        for col in range(5):  # 5列数据
                             item = self.gps_table.item(row, col)
                             text = item.text() if item else ""
-                            # 特殊处理数值列
+                            
+                            # 格式化数值列
                             if col in (1, 2, 3):  # X/Y/ζ列
                                 try:
                                     text = f"{float(text):.4f}"
                                 except ValueError:
                                     pass
-                            row_data.append(text)
+                            row_data.append(f'"{text}"')  # 添加引号防止格式错误
                         f.write(",".join(row_data) + "\n")
-                QMessageBox.information(self, "成功", f"结果已保存到\n{filename}")
+                QMessageBox.information(self, "成功", 
+                    f"结果已保存到：\n{filename}\n包含{self.gps_table.rowCount()}条记录")
         except Exception as e:
             QMessageBox.critical(self, "错误", f"导出失败: {str(e)}")
