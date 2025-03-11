@@ -1,3 +1,4 @@
+# ellipsoid_params.py
 # 椭球体参数数据库
 ELLIPSOID_PARAMS = {
     "克拉索夫斯基": {

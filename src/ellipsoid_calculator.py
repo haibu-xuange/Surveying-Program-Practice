@@ -1,3 +1,4 @@
+# ellipsoid_calculator.py
 import math
 from ellipsoid_params import ELLIPSOID_PARAMS
 

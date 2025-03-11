@@ -1,3 +1,4 @@
+# widgets.py 定义了一些常用的控件，包括标签页容器、结果表格等。
 from PyQt5.QtWidgets import QTabWidget, QTableWidget, QHeaderView
 
 class CalculationTabWidget(QTabWidget):
