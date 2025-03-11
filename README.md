@@ -43,5 +43,7 @@ EllipsoidCalculator类中提供获取椭球参数、计算曲率半径、计算�
 提供了详细的整体GUI基于pyqt5库的CSS样式表
 ### /*------widgets.py------*/
 提供了统一的计算标签容器和结果表格
-
+## 3、数据
+数据文件在/data文件夹中  
+其中coordinates_data.txt用于坐标转换计算，Point_elevation_data.txt用于GPS高程拟合计算
 
