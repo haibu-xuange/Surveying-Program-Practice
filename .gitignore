@@ -6,3 +6,6 @@ src/__pycache__/style.cpython-39.pyc
 src/__pycache__/style.cpython-311.pyc
 src/__pycache__/ui_module.cpython-39.pyc
 src/__pycache__/ui_module.cpython-311.pyc
+AstroConverter.spec
+/build
+/dist/AstroConverter/_internal
