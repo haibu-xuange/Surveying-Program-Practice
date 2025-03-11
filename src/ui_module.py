@@ -13,6 +13,8 @@ from widgets import CalculationTabWidget, ResultTable
 from ellipsoid_calculator import EllipsoidCalculator
 from ellipsoid_params import ELLIPSOID_PARAMS
 from gps_fitting import GPSFitter
+import os
+from datetime import datetime
 
 
 class MainWindow(QMainWindow):
@@ -611,29 +613,40 @@ class MainWindow(QMainWindow):
 
     def export_gps(self):
         try:
-            filename, _ = QFileDialog.getSaveFileName(self, "保存结果", "", "CSV文件 (*.csv)")
-            if filename:
-                with open(filename, 'w', encoding='utf-8-sig') as f:
-                    # 写表头
-                    headers = ["点号", "X", "Y", "高程异常ζ", "类型"]
-                    f.write(",".join(headers) + "\n")
-                    
-                    # 写数据
-                    for row in range(self.gps_table.rowCount()):
-                        row_data = []
-                        for col in range(5):  # 5列数据
-                            item = self.gps_table.item(row, col)
-                            text = item.text() if item else ""
-                            
-                            # 格式化数值列
-                            if col in (1, 2, 3):  # X/Y/ζ列
-                                try:
-                                    text = f"{float(text):.4f}"
-                                except ValueError:
-                                    pass
-                            row_data.append(f'"{text}"')  # 添加引号防止格式错误
-                        f.write(",".join(row_data) + "\n")
-                QMessageBox.information(self, "成功", 
-                    f"结果已保存到：\n{filename}\n包含{self.gps_table.rowCount()}条记录")
+            # 定义目标文件夹路径
+            result_dir = os.path.join("result", "GPS_Fitting_Result")
+            
+            # 如果文件夹不存在，则创建
+            os.makedirs(result_dir, exist_ok=True)
+            
+            # 生成文件名
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = os.path.join(result_dir, f"GFR_{timestamp}.csv")
+            
+            # 写入文件
+            with open(filename, 'w', encoding='utf-8-sig') as f:
+                # 写表头
+                headers = ["点号", "X", "Y", "高程异常ζ", "类型"]
+                f.write(",".join(headers) + "\n")
+                
+                # 写数据
+                for row in range(self.gps_table.rowCount()):
+                    row_data = []
+                    for col in range(5):  # 5列数据
+                        item = self.gps_table.item(row, col)
+                        text = item.text() if item else ""
+                        
+                        # 格式化数值列
+                        if col in (1, 2, 3):  # X/Y/ζ列
+                            try:
+                                text = f"{float(text):.4f}"
+                            except ValueError:
+                                pass
+                        row_data.append(f'"{text}"')  # 添加引号防止格式错误
+                    f.write(",".join(row_data) + "\n")
+            
+            # 提示用户
+            QMessageBox.information(self, "成功", 
+                f"结果已保存到：\n{filename}\n包含{self.gps_table.rowCount()}条记录")
         except Exception as e:
             QMessageBox.critical(self, "错误", f"导出失败: {str(e)}")
