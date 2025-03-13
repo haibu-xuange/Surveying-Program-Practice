@@ -81,4 +81,5 @@ class CoordinateConverter:
         d = float(parts[0])
         m = float(parts[1])
         s = float(parts[2])
+        
         return math.radians(d + m/60 + s/3600)

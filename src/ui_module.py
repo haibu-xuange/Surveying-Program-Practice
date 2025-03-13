@@ -20,7 +20,7 @@ from datetime import datetime
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("坐标转换系统")
+        self.setWindowTitle("测绘程序设计实践系统")
         self.setGeometry(100, 100, 900, 700)
         self.setWindowIcon(QIcon('icon.png'))        
         self.converter = CoordinateConverter()
@@ -298,12 +298,16 @@ class MainWindow(QMainWindow):
         self.end_b.setRange(0, 90)
         self.step_b = QDoubleSpinBox()
         self.step_b.setValue(1.0)
-        
+        self.A_input = QDoubleSpinBox()
+        self.A_input.setRange(0, 360)
+        self.A_input.setValue(45)  # 默认45度
+
         param_layout.addRow("椭球体:", self.ellipsoid_combo)
         param_layout.addRow("起始纬度(°):", self.start_b)
         param_layout.addRow("结束纬度(°):", self.end_b)
         param_layout.addRow("步长(°):", self.step_b)
         param_group.setLayout(param_layout)
+        param_layout.addRow("方位角A(°):", self.A_input)
         
         # 结果表格
         self.curvature_table = QTableWidget()
@@ -327,19 +331,25 @@ class MainWindow(QMainWindow):
             start = self.start_b.value()
             end = self.end_b.value()
             step = self.step_b.value()
+            A_deg = self.A_input.value()  # 获取用户输入的方位角
             
+            if step == 0:
+                raise ValueError("步长不能为0")
+            if (end > start and step < 0) or (end < start and step > 0):
+                raise ValueError("步长方向错误：起始纬度应小于结束纬度（正步长）或反之（负步长）")
+
             self.curvature_table.setRowCount(0)
             
             B = start
-            while B <= end:
-                result = EllipsoidCalculator.calculate_curvature(ellipsoid, B)
+            while (step > 0 and B <= end) or (step < 0 and B >= end):
+                result = EllipsoidCalculator.calculate_curvature(ellipsoid, B, A_deg)  # 传入A_deg
                 row = self.curvature_table.rowCount()
                 self.curvature_table.insertRow(row)
-                self.curvature_table.setItem(row, 0, QTableWidgetItem(f"{B}°"))
-                self.curvature_table.setItem(row, 1, QTableWidgetItem(f"{result['M']} m"))
-                self.curvature_table.setItem(row, 2, QTableWidgetItem(f"{result['N']} m"))
-                self.curvature_table.setItem(row, 3, QTableWidgetItem(f"{result['R']} m"))
-                self.curvature_table.setItem(row, 4, QTableWidgetItem(f"{result['RA']} m"))
+                self.curvature_table.setItem(row, 0, QTableWidgetItem(f"{B:.4f}°"))  # 显示4位小数
+                self.curvature_table.setItem(row, 1, QTableWidgetItem(f"{result['M']:.4f} m"))
+                self.curvature_table.setItem(row, 2, QTableWidgetItem(f"{result['N']:.4f} m"))
+                self.curvature_table.setItem(row, 3, QTableWidgetItem(f"{result['R']:.4f} m"))
+                self.curvature_table.setItem(row, 4, QTableWidgetItem(f"{result['RA']:.4f} m"))
                 B += step
                 
         except Exception as e:
@@ -477,7 +487,7 @@ class MainWindow(QMainWindow):
         file_group.setLayout(file_layout)
         
         # 参数选择组
-        param_group = QGroupBox("拟合参数")
+        param_group = QGroupBox("拟合模型")
         param_layout = QHBoxLayout()
         self.gps_method_combo = QComboBox()
         self.gps_method_combo.addItems(["二次曲面拟合", "多项式平面", "四参数曲面"])

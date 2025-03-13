@@ -16,7 +16,7 @@ class EllipsoidCalculator:
         return a, b, f, e2
 
     @staticmethod
-    def calculate_curvature(name, B_deg, A_deg=45):
+    def calculate_curvature(name, B_deg, A_deg):
         """计算曲率半径"""
         B = math.radians(B_deg)
         A = math.radians(A_deg)
@@ -75,3 +75,4 @@ class EllipsoidCalculator:
                + (l**2/3)*(1 + 3*eta2 + 2*eta2**2)*math.sin(B)**2 
                + (l**4/15)*(2 - math.tan(B)**2))
         return round(math.degrees(gamma), 6)
+    
