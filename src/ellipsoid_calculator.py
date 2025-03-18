@@ -63,7 +63,7 @@ class EllipsoidCalculator:
 
     @staticmethod
     def calculate_convergence(name, B_deg, l_deg):
-        """精确平面子午线收敛角计算"""
+        """精确平面子午线收敛角计算（标准高斯投影公式）"""
         B = math.radians(B_deg)
         l = math.radians(l_deg)
         a, _, f, e2 = EllipsoidCalculator.get_ellipsoid(name)
@@ -71,8 +71,9 @@ class EllipsoidCalculator:
         t = math.tan(B)
         eta2 = e2 * math.cos(B)**2 / (1 - e2)
         
-        gamma = l*math.sin(B) * (1 
-               + (l**2/3)*(1 + 3*eta2 + 2*eta2**2)*math.sin(B)**2 
-               + (l**4/15)*(2 - math.tan(B)**2))
+        # 标准公式展开项
+        l3_term = (l**3 / 3) * (1 + eta2)
+        l5_term = (l**5 / 15) * (2 - t**2 + 3 * eta2**2) 
+        gamma = l * math.sin(B) * (1 + l3_term + l5_term)
         return round(math.degrees(gamma), 6)
     

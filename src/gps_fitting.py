@@ -17,6 +17,7 @@ class GPSFitter:
     def four_param_model(coords, a, b, c, d):
         x, y = coords
         return a*x + b*y + c*x*y + d
+    
 
     @classmethod
     def fit(cls, known_points, method='quadratic'):

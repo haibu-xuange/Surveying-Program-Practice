@@ -17,3 +17,4 @@ class ResultTable(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.verticalHeader().setVisible(False)
         self.setEditTriggers(QTableWidget.NoEditTriggers)
+        
