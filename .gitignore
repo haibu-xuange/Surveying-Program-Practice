@@ -9,3 +9,6 @@ src/__pycache__/ui_module.cpython-311.pyc
 AstroConverter.spec
 /build
 /dist/AstroConverter/_internal
+/测绘程序设计实践系统.spec
+/build
+/dist/测绘程序设计实践系统/_internal
