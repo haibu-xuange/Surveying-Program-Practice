@@ -26,7 +26,9 @@ class EllipsoidCalculator:
         M = a*(1-e2) / (W**3)          # 子午圈曲率半径
         N = a / W                      # 卯酉圈曲率半径
         R = math.sqrt(M*N)             # 平均曲率半径
-        RA = N / (1 + (N/M)*math.tan(A)**2)  # 任意方向曲率半径
+        sinA = math.sin(A)
+        cosA = math.cos(A)
+        RA = (M * N) / (M * sinA**2 + N * cosA**2)  # 任意方向曲率半径
         
         return {
             "M": round(M, 4),
@@ -52,11 +54,11 @@ class EllipsoidCalculator:
         
         def term(B):
             return a*(1-n)*(
-                A0*(B - B1) 
-                - A2*math.sin(2*B)/2 
-                + A4*math.sin(4*B)/4 
-                - A6*math.sin(6*B)/6 
-                + A8*math.sin(8*B)/8
+                A0*(B) 
+                - A2*math.sin(2*B)
+                + A4*math.sin(4*B)
+                - A6*math.sin(6*B)
+                + A8*math.sin(8*B)
             )
         
         return term(B2) - term(B1)
